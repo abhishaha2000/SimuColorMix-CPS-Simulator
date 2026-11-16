@@ -35,34 +35,54 @@ if uploaded_file is not None:
     max_x = img_cv.shape[1] - 1
     max_y = img_cv.shape[0] - 1
 
-    x = st.number_input(
-        "X coordinate (width)",
-        min_value=0,
-        max_value=max_x,
-        value=min(50, max_x // 2)
-    )
+    col_x, col_y = st.columns(2)
+    with col_x:
+        x = st.number_input(
+            "X coordinate (width)",
+            min_value=0,
+            max_value=max_x,
+            value=min(50, max_x // 2)
+        )
 
-    y = st.number_input(
-        "Y coordinate (height)",
-        min_value=0,
-        max_value=max_y,
-        value=min(50, max_y // 2)
-    )
+    with col_y:
+        y = st.number_input(
+            "Y coordinate (height)",
+            min_value=0,
+            max_value=max_y,
+            value=min(50, max_y // 2)
+        )
 
     # Extract BGR values and convert to standard Python integers
     b, g, r = [int(val) for val in img_cv[int(y), int(x)]]
     rgb_color = (r, g, b)
+    hex_color = f"#{r:02x}{g:02x}{b:02x}".upper()
 
-    st.write(f"**Extracted Color (R, G, B): {rgb_color}**")
+    st.write(f"**Extracted Color (R, G, B):** `{rgb_color}` | **HEX:** `{hex_color}`")
 
     # -------------------------------
-    # Color Preview
+    # Side-by-Side Color Comparison
     # -------------------------------
-    st.markdown("### Selected Color Preview")
-    st.color_picker(
-        "Extracted Color",
-        f"#{r:02x}{g:02x}{b:02x}"
-    )
+    st.markdown("### Color Comparison (Extracted vs. Mixed)")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        extracted_box = np.zeros((150, 150, 3), np.uint8)
+        extracted_box[:] = (r, g, b)
+        st.image(
+            extracted_box,
+            caption=f"Extracted Color\nRGB: ({r}, {g}, {b})",
+            use_container_width=False
+        )
+        st.color_picker("Extracted Color Picker", hex_color)
+
+    with col2:
+        final_color = np.zeros((150, 150, 3), np.uint8)
+        final_color[:] = (r, g, b)
+        st.image(
+            final_color,
+            caption=f"Final Mixed Output\nRGB: ({r}, {g}, {b})",
+            use_container_width=False
+        )
 
     # -------------------------------
     # Pump Simulation Calculation
@@ -74,9 +94,10 @@ if uploaded_file is not None:
     b_perc = (b / total) * 100
 
     st.markdown("### Pump Simulation (RGB Proportions)")
-    st.write(f"🔴 Red Pump: {r_perc:.2f}%")
-    st.write(f"🟢 Green Pump: {g_perc:.2f}%")
-    st.write(f"🔵 Blue Pump: {b_perc:.2f}%")
+    p1, p2, p3 = st.columns(3)
+    p1.metric("🔴 Red Pump", f"{r_perc:.2f}%")
+    p2.metric("🟢 Green Pump", f"{g_perc:.2f}%")
+    p3.metric("🔵 Blue Pump", f"{b_perc:.2f}%")
 
     # -------------------------------
     # Bar Chart Visualization
@@ -90,13 +111,3 @@ if uploaded_file is not None:
     ax.set_ylim(0, 100)
 
     st.pyplot(fig)
-
-    # -------------------------------
-    # Final Mixed Color Output
-    # -------------------------------
-    st.markdown("### Final Mixed Color")
-
-    final_color = np.zeros((150, 150, 3), np.uint8)
-    final_color[:] = (r, g, b)  # Streamlit requires RGB format
-
-    st.image(final_color, caption="Mixed Output Color", use_container_width=False)
