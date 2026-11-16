@@ -20,8 +20,8 @@ and simulates the mixing process using virtual pumps.
 uploaded_file = st.file_uploader("Upload an Image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    # Open image using PIL
-    image = Image.open(uploaded_file)
+    # Open image using PIL and ensure 3 channels (RGB)
+    image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Uploaded Image", use_container_width=True)
 
     # Convert PIL image to OpenCV format (BGR)
@@ -32,22 +32,25 @@ if uploaded_file is not None:
     # -------------------------------
     st.subheader("Select Pixel Coordinates")
 
+    max_x = img_cv.shape[1] - 1
+    max_y = img_cv.shape[0] - 1
+
     x = st.number_input(
         "X coordinate (width)",
         min_value=0,
-        max_value=img_cv.shape[1] - 1,
-        value=50
+        max_value=max_x,
+        value=min(50, max_x // 2)
     )
 
     y = st.number_input(
         "Y coordinate (height)",
         min_value=0,
-        max_value=img_cv.shape[0] - 1,
-        value=50
+        max_value=max_y,
+        value=min(50, max_y // 2)
     )
 
-    # Extract BGR values
-    b, g, r = img_cv[int(y), int(x)]
+    # Extract BGR values and convert to standard Python integers
+    b, g, r = [int(val) for val in img_cv[int(y), int(x)]]
     rgb_color = (r, g, b)
 
     st.write(f"**Extracted Color (R, G, B): {rgb_color}**")
@@ -93,7 +96,7 @@ if uploaded_file is not None:
     # -------------------------------
     st.markdown("### Final Mixed Color")
 
-    final_color = np.zeros((100, 100, 3), np.uint8)
-    final_color[:] = (b, g, r)  # OpenCV uses BGR
+    final_color = np.zeros((150, 150, 3), np.uint8)
+    final_color[:] = (r, g, b)  # Streamlit requires RGB format
 
     st.image(final_color, caption="Mixed Output Color", use_container_width=False)
