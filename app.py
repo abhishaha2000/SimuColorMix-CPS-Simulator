@@ -5,9 +5,32 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 # -------------------------------
-# App Title & Description
+# Page Configuration
+# -------------------------------
+st.set_page_config(
+    page_title="Color Recognition Simulator | Abhishek Shaha",
+    page_icon="🎨",
+    layout="centered"
+)
+
+# -------------------------------
+# Sidebar - Host & Project Info
+# -------------------------------
+with st.sidebar:
+    st.header("👨‍💻 Project Host")
+    st.markdown("""
+    **Abhishek Shaha**  
+    *Dept. of E&TC Engineering*  
+    ---
+    **About Simulator:**  
+    Real-time RGB color extraction and virtual pump mixing simulation using Python & OpenCV.
+    """)
+
+# -------------------------------
+# App Title & Host Banner
 # -------------------------------
 st.title("🎨 IoT-based Real-Time Color Recognition & Mixing Simulator")
+st.caption("🚀 **Hosted & Developed by:** Abhishek Shaha")
 
 st.markdown("""
 This simulator extracts colors from an uploaded image, shows RGB values,  
@@ -111,3 +134,14 @@ if uploaded_file is not None:
     ax.set_ylim(0, 100)
 
     st.pyplot(fig)
+
+# -------------------------------
+# Footer
+# -------------------------------
+st.markdown("---")
+st.markdown(
+    "<div style='text-align: center; color: gray;'>"
+    "© 2026 | Designed & Hosted by <b>Abhishek Shaha</b>"
+    "</div>",
+    unsafe_allow_html=True
+)
